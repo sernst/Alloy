@@ -12,13 +12,19 @@ class AlloyEnvironment(object):
 #===================================================================================================
 #                                                                                       C L A S S
 
-    _styleSheets = dict()
+    ROOT_CONFIG_PATH   = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..', '..', 'config'
+    )
 
-    ROOT_CONFIG_PATH   = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'config')
-    ROOT_RESOURCE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'resources')
+    ROOT_RESOURCE_PATH = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), '..', '..', 'resources'
+    )
+
     DEFAULT_ICON       = u'8.jpg'
 
-#___________________________________________________________________________________________________ getIconPath
+    _styleSheets = dict()
+
+#___________________________________________________________________________________________________ getRootIconPath
     @classmethod
     def getRootIconPath(cls):
         return unicode(os.path.join(cls.ROOT_RESOURCE_PATH, u'icons')) + os.sep
@@ -45,9 +51,12 @@ class AlloyEnvironment(object):
 #___________________________________________________________________________________________________ getDatabaseURL
     @classmethod
     def getDatabaseURL(cls, name =None, folder =None):
-        name = unicode(name)
-        if not name.endswith(u'.alloy'):
-            name += u'.alloy'
+        if not name:
+            name = u'user.alloy'
+        else:
+            name = unicode(name)
+            if not name.endswith(u'.alloy'):
+                name += u'.alloy'
 
         if not folder:
             folder = u'data'

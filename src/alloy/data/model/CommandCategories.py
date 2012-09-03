@@ -2,8 +2,8 @@
 # (C)2012 http://www.ThreeAddOne.com
 # Scott Ernst
 
-from sqlalchemy import BigInteger
 from sqlalchemy import Column
+from sqlalchemy import Integer
 from sqlalchemy import Unicode
 
 from alloy.data.model import Base
@@ -18,8 +18,12 @@ class CommandCategories(Base):
     __tablename__  = 'commandcategories'
     __table_args__ = {'sqlite_autoincrement': True}
 
-    i       = Column(BigInteger, primary_key=True)
+    i       = Column(Integer, primary_key=True)
     label   = Column(Unicode, default=u'My Group')
+    column1 = Column(Unicode, default=u'Column 1')
+    column2 = Column(Unicode, default=u'Column 2')
+    column3 = Column(Unicode, default=u'Column 3')
+    column4 = Column(Unicode, default=u'Column 4')
 
     _ID_PREFIX = u'cat'
 
@@ -34,6 +38,17 @@ class CommandCategories(Base):
 #===================================================================================================
 #                                                                                     P U B L I C
 
+#___________________________________________________________________________________________________ toDict
+    def toDict(self):
+        return {
+            'id':self.categoryID,
+            'label':self.label,
+            'column1':self.column1,
+            'column2':self.column2,
+            'column3':self.column3,
+            'column4':self.column4,
+        }
+
 #___________________________________________________________________________________________________ GS: getCategoryIDFromIndex
     @classmethod
     def getCategoryIDFromIndex(cls, index):
@@ -42,6 +57,11 @@ class CommandCategories(Base):
 #___________________________________________________________________________________________________ GS: getIndexFromCategoryID
     @classmethod
     def getIndexFromCategoryID(cls, categoryID):
+        if isinstance(categoryID, CommandCategories):
+            categoryID = categoryID.categoryID
+        elif isinstance(categoryID, dict):
+            categoryID = categoryID['id']
+
         return int(categoryID[len(CommandCategories._ID_PREFIX):])
 
 #===================================================================================================

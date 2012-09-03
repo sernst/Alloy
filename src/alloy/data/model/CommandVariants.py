@@ -1,4 +1,4 @@
-# UserCommands.py
+# CommandVariants.py
 # (C)2012 http://www.ThreeAddOne.com
 # Scott Ernst
 
@@ -8,21 +8,20 @@ from sqlalchemy import Unicode
 from sqlalchemy import UnicodeText
 
 from alloy.data.model import Base
-from alloy.data.model.CommandCategories import CommandCategories
+from alloy.data.model.UserCommands import UserCommands
 
-#___________________________________________________________________________________________________ UserCommands
-class UserCommands(Base):
+#___________________________________________________________________________________________________ CommandVariants
+class CommandVariants(Base):
     """A class for..."""
 
 #===================================================================================================
 #                                                                                       C L A S S
 
-    __tablename__  = 'usercommands'
+    __tablename__  = 'usercommandvariants'
     __table_args__ = {'sqlite_autoincrement': True}
 
     i          = Column(Integer, primary_key=True)
-    categoryfk = Column(Integer, default=None)
-    column     = Column(Integer, default=1)
+    usrcmdfk   = Column(Integer, default=None)
     row        = Column(Integer, default=0)
     label      = Column(Unicode, default=u'My Command')
     info       = Column(Unicode, default=u'')
@@ -31,30 +30,15 @@ class UserCommands(Base):
     location   = Column(Unicode, default=u'maya')
     script     = Column(UnicodeText, default=u'')
 
-    _ID_PREFIX = u'cmd'
+    _ID_PREFIX = u'cmdvar'
 
 #===================================================================================================
 #                                                                                   G E T / S E T
 
-#___________________________________________________________________________________________________ GS: variants
+#___________________________________________________________________________________________________ GS: variantID
     @property
-    def variants(self):
-        from alloy.data.model import Session
-        from alloy.data.model.CommandVariants import CommandVariants
-        session = Session()
-        result = session.query(CommandVariants).filter(CommandVariants.usrcmdfk == self.i).all()
-
-        out = []
-        for r in result:
-            out.append(r.toButtonDict())
-
-        session.close()
-        return out
-
-#___________________________________________________________________________________________________ GS: commandID
-    @property
-    def commandID(self):
-        return UserCommands._ID_PREFIX + str(self.i)
+    def variantID(self):
+        return CommandVariants._ID_PREFIX + str(self.i)
 
 #===================================================================================================
 #                                                                                     P U B L I C
@@ -62,41 +46,35 @@ class UserCommands(Base):
 #___________________________________________________________________________________________________ toButtonDict
     def toButtonDict(self):
         return {
-            'id':self.commandID,
-            'column':self.column,
-            'row':self.row,
-            'categoryID':CommandCategories.getCategoryIDFromIndex(self.categoryfk),
+            'id':self.variantID,
+            'commandID':UserCommands.getCommandIDFromIndex(self.usrcmdfk),
             'label':self.label,
             'info':self.info,
-            'icon':self.icon,
-            'hasVariants':len(self.variants) > 0
+            'icon':self.icon
         }
 
 #___________________________________________________________________________________________________ toDict
     def toDict(self):
         return {
-            'id':self.commandID,
-            'column':self.column,
-            'row':self.row,
-            'categoryID':CommandCategories.getCategoryIDFromIndex(self.categoryfk),
+            'id':self.variantID,
+            'commandID':UserCommands.getCommandIDFromIndex(self.usrcmdfk),
             'label':self.label,
             'info':self.info,
             'icon':self.icon,
             'language':self.language,
             'location':self.location,
-            'script':self.script,
-            'variants':self.variants
+            'script':self.script
         }
 
-#___________________________________________________________________________________________________ GS: getCommandIDFromIndex
+#___________________________________________________________________________________________________ GS: getVariantIDFromIndex
     @classmethod
-    def getCommandIDFromIndex(cls, index):
-        return UserCommands._ID_PREFIX + unicode(index)
+    def getVariantIDFromIndex(cls, index):
+        return CommandVariants._ID_PREFIX + unicode(index)
 
-#___________________________________________________________________________________________________ GS: getIndexFromCommandID
+#___________________________________________________________________________________________________ GS: getIndexFromVariantID
     @classmethod
-    def getIndexFromCommandID(cls, commandID):
-        return int(commandID[len(UserCommands._ID_PREFIX):])
+    def getIndexFromVariantID(cls, variantID):
+        return int(variantID[len(CommandVariants._ID_PREFIX):])
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

@@ -21,6 +21,7 @@ class AlloyApplication(QMainWindow):
 
         cw = AlloyHomeWidget(self)
         self.setCentralWidget(cw)
+        self.setWindowTitle('Alloy')
 
         self.setStyleSheet(AlloyEnvironment.getStylesheet())
 

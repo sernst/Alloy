@@ -11,9 +11,9 @@ from PySide.QtWebKit import *
 from alloy.AlloyEnvironment import AlloyEnvironment
 from alloy.core.application.AlloyWebPage import AlloyWebPage
 from alloy.core.home.AlloyCommunicator import AlloyCommunicator
+from alloy.core.application.remoteExec import remoteExec
 from alloy.data.AlloyData import AlloyData
 import nimble
-from nimble.data.enum.DataKindEnum import DataKindEnum
 
 #___________________________________________________________________________________________________ AlloyHomeWidget
 class AlloyHomeWidget(QWidget):
@@ -33,9 +33,21 @@ class AlloyHomeWidget(QWidget):
         comm.addAction('execute', self._handleExecuteCommand)
 
         comm.addAction('getCategories', self._handleGetCategories)
-        comm.addAction('getCommands', self._handleGetCommands)
-        comm.addAction('getImageList', self._handleGetImageList)
+        comm.addAction('getColumns', self._handleGetColumns)
         comm.addAction('getCommandData', self._handleGetCommandData)
+        comm.addAction('getVariantData', self._handleGetVariantData)
+        comm.addAction('hasVariants', self._handleHasVariants)
+        comm.addAction('getVariants', self._handleGetVariants)
+
+        comm.addAction('getImageCategories', self._handleGetImageCategories)
+        comm.addAction('getImageList', self._handleGetImageList)
+
+        comm.addAction('updateColumn', self._handleUpdateColumn)
+        comm.addAction('reorderVariants', self._handleReorderVariants)
+
+        comm.addAction('createVariant', self._handleCreateVariant)
+        comm.addAction('modifyVariant', self._handleModifyVariant)
+        comm.addAction('deleteVariant', self._handleDeleteVariant)
 
         comm.addAction('createCommand', self._handleCreateCommand)
         comm.addAction('modifyCommand', self._handleModifyCommand)
@@ -65,9 +77,9 @@ class AlloyHomeWidget(QWidget):
         self._mainBox.addWidget(self._view)
 
         try:
-            self._conn = nimble.getConnection()
+            conn = nimble.getConnection()
         except Exception, err:
-            self._conn = None
+            pass
 
 #===================================================================================================
 #                                                                               P R O T E C T E D
@@ -87,34 +99,68 @@ class AlloyHomeWidget(QWidget):
         return AlloyData.getCategories()
 
 #___________________________________________________________________________________________________ _handleGetCommands
-    def _handleGetCommands(self, payload):
-        return AlloyData.getCommands(payload.get('categoryID', None))
+    def _handleGetColumns(self, payload):
+        return AlloyData.getColumns(payload.get('categoryID', None))
 
 #___________________________________________________________________________________________________ _handleExecuteCommand
     def _handleExecuteCommand(self, payload):
-        command = AlloyData.getCommandData(payload['commandID'])
-        if command is None:
+
+        if 'commandID' in payload:
+            command = AlloyData.getCommandData(payload['commandID'])
+        elif 'variantID' in payload:
+            command = AlloyData.getVariantData(payload['variantID'])
+        else:
             return False
 
-        print 'EXECUTING:', command
-        try:
-            if not self._conn:
-                self._conn = nimble.getConnection()
-
-            if command['kind'] == DataKindEnum.MAYA_COMMAND:
-                self._conn.maya(command['command'], *command['args'], **command['kwargs'])
-        except Exception, err:
+        if not command:
             return False
+
+        if command['language'] == 'python':
+            if command['location'] == 'remote':
+                return remoteExec(command['script'])
+            else:
+                try:
+                    conn = nimble.getConnection()
+                    conn.runPythonScript(command['script'])
+                except Exception, err:
+                    return False
+        else:
+            print 'Executing mel script'
+            try:
+                conn = nimble.getConnection()
+                conn.runMelScript(command['script'])
+            except Exception, err:
+                return False
 
         return True
 
+#___________________________________________________________________________________________________ _handleGetImageCategories
+    def _handleGetImageCategories(self, payload):
+        out      = []
+        rootPath = AlloyEnvironment.getRootIconPath()
+        for p in os.listdir(rootPath):
+            path = os.path.join(rootPath, p)
+            if not os.path.isdir(path):
+                continue
+
+            items = os.listdir(path)
+            if not items:
+                continue
+
+            out.append({'label':p[0].upper() + p[1:], 'id':p})
+
+        return out
+
 #___________________________________________________________________________________________________ _handleGetImageList
     def _handleGetImageList(self, payload):
-        out = []
-        for image in os.listdir(AlloyEnvironment.getRootIconPath()):
+        out      = []
+        rootPath = AlloyEnvironment.getRootIconPath()
+        folder   = payload['imageCategoryID']
+
+        for image in os.listdir(os.path.join(rootPath, folder)):
             if image.split(u'.')[-1] not in [u'jpg', u'png']:
                 continue
-            out.append(image)
+            out.append(folder + os.sep + image)
 
         return out
 
@@ -136,7 +182,7 @@ class AlloyHomeWidget(QWidget):
 
 #___________________________________________________________________________________________________ _handleGetCommandData
     def _handleGetCommandData(self, payload):
-        return AlloyData.getCommandData(payload['id'])
+        return AlloyData.getCommandData(**payload)
 
 #___________________________________________________________________________________________________ _handleModifyCategory
     def _handleModifyCategory(self, payload):
@@ -145,6 +191,38 @@ class AlloyHomeWidget(QWidget):
 #___________________________________________________________________________________________________ _handleDeleteCategory
     def _handleDeleteCategory(self, payload):
         return AlloyData.deleteCategory(**payload)
+
+#___________________________________________________________________________________________________ _handleUpdateColumn
+    def _handleUpdateColumn(self, payload):
+        return AlloyData.reorderColumn(**payload)
+
+#___________________________________________________________________________________________________ _handleGetVariant
+    def _handleGetVariantData(self, payload):
+        return AlloyData.getVariantData(**payload)
+
+#___________________________________________________________________________________________________ _handleGetVariants
+    def _handleGetVariants(self, payload):
+        return AlloyData.getVariants(**payload)
+
+#___________________________________________________________________________________________________ _handleCreateVariant
+    def _handleCreateVariant(self, payload):
+        return AlloyData.createVariant(**payload)
+
+#___________________________________________________________________________________________________ _handleModifyVariant
+    def _handleModifyVariant(self, payload):
+        return AlloyData.modifyVariant(**payload)
+
+#___________________________________________________________________________________________________ _handleCreateVariant
+    def _handleDeleteVariant(self, payload):
+        return AlloyData.deleteVariant(**payload)
+
+#___________________________________________________________________________________________________ _handleReorderVariants
+    def _handleReorderVariants(self, payload):
+        return AlloyData.reorderVariants(**payload)
+
+#___________________________________________________________________________________________________ _handleHasVariants
+    def _handleHasVariants(self, payload):
+        return AlloyData.hasVariants(**payload)
 
 #===================================================================================================
 #                                                                               I N T R I N S I C
