@@ -22,35 +22,9 @@ class AlloyApplication(QMainWindow):
         cw = AlloyHomeWidget(self)
         self.setCentralWidget(cw)
         self.setWindowTitle('Alloy')
+        self.setContentsMargins(0, 0, 0, 0)
 
         self.setStyleSheet(AlloyEnvironment.getStylesheet())
-
-#===================================================================================================
-#                                                                                   G E T / S E T
-
-#___________________________________________________________________________________________________ GS: propertyName
-    @property
-    def propertyName(self):
-        return None
-    @propertyName.setter
-    def propertyName(self, value):
-        pass
-
-#===================================================================================================
-#                                                                                     P U B L I C
-
-#___________________________________________________________________________________________________ publicMethod
-    def publicMethod(self):
-        """Doc..."""
-        pass
-
-#===================================================================================================
-#                                                                               P R O T E C T E D
-
-#___________________________________________________________________________________________________ _internalMethod
-    def _internalMethod(self):
-        """Doc..."""
-        pass
 
 #===================================================================================================
 #                                                                               I N T R I N S I C

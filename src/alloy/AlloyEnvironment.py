@@ -7,7 +7,9 @@ from PySide.QtGui import *
 
 #___________________________________________________________________________________________________ AlloyEnvironment
 class AlloyEnvironment(object):
-    """A class for..."""
+    """ Stores environmental variables as well as acting as an environmental interface via
+        class method getters.
+    """
 
 #===================================================================================================
 #                                                                                       C L A S S
@@ -20,7 +22,8 @@ class AlloyEnvironment(object):
         os.path.dirname(os.path.abspath(__file__)), '..', '..', 'resources'
     )
 
-    DEFAULT_ICON       = u'8.jpg'
+    DEFAULT_ICON = u'8.jpg'
+    DEVELOPMENT  = True
 
     _styleSheets = dict()
 

@@ -63,14 +63,19 @@ class AlloyHomeWidget(QWidget):
         self._view  = QWebView()
         page        = AlloyWebPage()
         self._view.setPage(page)
-        self._webInspector = QWebInspector()
-        self._webInspector.setPage(page)
-        page.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
 
-        shortcut = QShortcut(self)
-        shortcut.setKey(QKeySequence(Qt.Key_F12))
-        shortcut.activated.connect(self.toggleInspector)
-        self._webInspector.setVisible(False)
+        settings = page.settings()
+        settings.setAttribute(QWebSettings.JavascriptCanAccessClipboard, True)
+
+        if AlloyEnvironment.DEVELOPMENT:
+            self._webInspector = QWebInspector()
+            self._webInspector.setPage(page)
+
+            settings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+            shortcut = QShortcut(self)
+            shortcut.setKey(QKeySequence(Qt.Key_F12))
+            shortcut.activated.connect(self.toggleInspector)
+            self._webInspector.setVisible(False)
 
         self._view.loadFinished.connect(self._handleLoadFinished)
         self._view.setUrl(QUrl('http://17.vizmedev.com/guiHome/'))
@@ -123,6 +128,7 @@ class AlloyHomeWidget(QWidget):
                     conn = nimble.getConnection()
                     conn.runPythonScript(command['script'])
                 except Exception, err:
+                    print err
                     return False
         else:
             print 'Executing mel script'
@@ -130,6 +136,7 @@ class AlloyHomeWidget(QWidget):
                 conn = nimble.getConnection()
                 conn.runMelScript(command['script'])
             except Exception, err:
+                print err
                 return False
 
         return True
