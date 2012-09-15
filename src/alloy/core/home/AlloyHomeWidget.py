@@ -28,34 +28,36 @@ class AlloyHomeWidget(QWidget):
         QWidget.__init__(self, parent, flags)
         self.setStyleSheet(AlloyEnvironment.getStylesheet())
 
-        comm = AlloyCommunicator()
+        comm        = AlloyCommunicator()
+        add         = comm.addAction
         self._comm  = comm
-        comm.addAction('execute', self._handleExecuteCommand)
 
-        comm.addAction('getCategories', self._handleGetCategories)
-        comm.addAction('getColumns', self._handleGetColumns)
-        comm.addAction('getCommandData', self._handleGetCommandData)
-        comm.addAction('getVariantData', self._handleGetVariantData)
-        comm.addAction('hasVariants', self._handleHasVariants)
-        comm.addAction('getVariants', self._handleGetVariants)
+        add('execute', self._handleExecuteCommand)
 
-        comm.addAction('getImageCategories', self._handleGetImageCategories)
-        comm.addAction('getImageList', self._handleGetImageList)
+        add('getCategories', self._handleGetCategories)
+        add('getColumns', self._handleGetColumns)
+        add('getCommandData', self._handleGetCommandData)
+        add('getVariantData', self._handleGetVariantData)
+        add('hasVariants', self._handleHasVariants)
+        add('getVariants', self._handleGetVariants)
 
-        comm.addAction('updateColumn', self._handleUpdateColumn)
-        comm.addAction('reorderVariants', self._handleReorderVariants)
+        add('getImageCategories', self._handleGetImageCategories)
+        add('getImageList', self._handleGetImageList)
 
-        comm.addAction('createVariant', self._handleCreateVariant)
-        comm.addAction('modifyVariant', self._handleModifyVariant)
-        comm.addAction('deleteVariant', self._handleDeleteVariant)
+        add('updateColumn', self._handleUpdateColumn)
+        add('reorderVariants', self._handleReorderVariants)
 
-        comm.addAction('createCommand', self._handleCreateCommand)
-        comm.addAction('modifyCommand', self._handleModifyCommand)
-        comm.addAction('deleteCommand', self._handleDeleteCommand)
+        add('createVariant', self._handleCreateVariant)
+        add('modifyVariant', self._handleModifyVariant)
+        add('deleteVariant', self._handleDeleteVariant)
 
-        comm.addAction('createCategory', self._handleCreateCategory)
-        comm.addAction('modifyCategory', self._handleModifyCategory)
-        comm.addAction('deleteCategory', self._handleDeleteCategory)
+        add('createCommand', self._handleCreateCommand)
+        add('modifyCommand', self._handleModifyCommand)
+        add('deleteCommand', self._handleDeleteCommand)
+
+        add('createCategory', self._handleCreateCategory)
+        add('modifyCategory', self._handleModifyCategory)
+        add('deleteCategory', self._handleDeleteCategory)
 
         self._mainBox = QVBoxLayout()
         self.setLayout(self._mainBox)
@@ -78,7 +80,7 @@ class AlloyHomeWidget(QWidget):
             self._webInspector.setVisible(False)
 
         self._view.loadFinished.connect(self._handleLoadFinished)
-        self._view.setUrl(QUrl('http://17.vizmedev.com/guiHome/'))
+        self._view.setUrl(QUrl(AlloyEnvironment.getHomeUrl()))
         self._mainBox.addWidget(self._view)
 
         try:

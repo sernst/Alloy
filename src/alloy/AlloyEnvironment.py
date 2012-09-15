@@ -24,8 +24,17 @@ class AlloyEnvironment(object):
 
     DEFAULT_ICON = u'8.jpg'
     DEVELOPMENT  = True
+    LOG_LEVEL    = 0
 
     _styleSheets = dict()
+
+    _URL     = 'http://17.vizmeweb.com/guiHome/'
+    _DEV_URL = 'http://17.vizmedev.com/guiHome/'
+
+#___________________________________________________________________________________________________ getHomeUrl
+    @classmethod
+    def getHomeUrl(cls):
+        return cls._DEV_URL if cls.DEVELOPMENT else cls._URL
 
 #___________________________________________________________________________________________________ getRootIconPath
     @classmethod
@@ -64,7 +73,11 @@ class AlloyEnvironment(object):
         if not folder:
             folder = u'data'
 
-        return u'sqlite:///' + unicode(os.path.join(cls.ROOT_RESOURCE_PATH, folder, name))
+        path = unicode(os.path.join(cls.ROOT_RESOURCE_PATH, folder, name))
+        if not path.startswith(u'/'):
+            path = u'/' + path
+
+        return u'sqlite://' + path
 
 #___________________________________________________________________________________________________ getImage
     @classmethod
@@ -77,16 +90,16 @@ class AlloyEnvironment(object):
     @classmethod
     def getStylesheetPath(cls, name =None, folder =None):
         if not name:
-            name = 'global.css'
+            name = u'global.css'
 
         if not folder:
-            folder = 'style'
+            folder = u'style'
 
         stylePath = os.path.join(cls.ROOT_RESOURCE_PATH, folder, name)
         if os.path.exists(stylePath):
             return stylePath
-        elif os.path.exists(stylePath + '.css'):
-            return stylePath + '.css'
+        elif os.path.exists(stylePath + u'.css'):
+            return stylePath + u'.css'
 
         return None
 
