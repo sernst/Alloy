@@ -47,7 +47,7 @@ class AlloyCommunicator(QObject):
     def getImage(self, imageID):
         image = AlloyEnvironment.getImage(unicode(imageID))
         if not image:
-            image = AlloyEnvironment.getImage(u'8.jpg')
+            image = AlloyEnvironment.getImage()
         return image
 
 #___________________________________________________________________________________________________ receive

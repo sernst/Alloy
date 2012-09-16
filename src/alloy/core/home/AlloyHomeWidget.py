@@ -33,6 +33,7 @@ class AlloyHomeWidget(QWidget):
         self._comm  = comm
 
         add('execute', self._handleExecuteCommand)
+        add('getDefaultImage', self._handleReturnDefaultImage)
 
         add('getCategories', self._handleGetCategories)
         add('getColumns', self._handleGetColumns)
@@ -88,18 +89,22 @@ class AlloyHomeWidget(QWidget):
         except Exception, err:
             pass
 
-#===================================================================================================
-#                                                                               P R O T E C T E D
-
 #___________________________________________________________________________________________________ toggleInspector
     def toggleInspector(self):
         self._webInspector.setVisible(not self._webInspector.isVisible())
+
+#===================================================================================================
+#                                                                               P R O T E C T E D
 
 #___________________________________________________________________________________________________ _handleLoadFinished
     def _handleLoadFinished(self, result):
         frame = self._view.page().mainFrame()
         self._comm.frame = frame
         frame.addToJavaScriptWindowObject('ALLOY', self._comm)
+
+#___________________________________________________________________________________________________ _handleReturnDefaultImage
+    def _handleReturnDefaultImage(self, payload):
+        return AlloyEnvironment.DEFAULT_ICON
 
 #___________________________________________________________________________________________________ _handleGetCategories
     def _handleGetCategories(self, payload):

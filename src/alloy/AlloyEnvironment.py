@@ -22,8 +22,8 @@ class AlloyEnvironment(object):
         os.path.dirname(os.path.abspath(__file__)), '..', '..', 'resources'
     )
 
-    DEFAULT_ICON = u'8.jpg'
-    DEVELOPMENT  = True
+    DEFAULT_ICON = u'maya.png'
+    DEVELOPMENT  = False
     LOG_LEVEL    = 0
 
     _styleSheets = dict()
@@ -44,7 +44,10 @@ class AlloyEnvironment(object):
 #___________________________________________________________________________________________________ getIconPath
     @classmethod
     def getIconPath(cls, name, folder =None):
-        name = unicode(name)
+        if not name:
+            name = cls.DEFAULT_ICON
+        else:
+            name = unicode(name)
 
         if not folder:
             folder = u'icons'

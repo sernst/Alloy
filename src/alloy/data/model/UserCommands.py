@@ -7,6 +7,7 @@ from sqlalchemy import Integer
 from sqlalchemy import Unicode
 from sqlalchemy import UnicodeText
 
+from alloy.AlloyEnvironment import AlloyEnvironment
 from alloy.data.model import Base
 from alloy.data.model.CommandCategories import CommandCategories
 
@@ -26,7 +27,7 @@ class UserCommands(Base):
     row        = Column(Integer, default=0)
     label      = Column(Unicode, default=u'My Command')
     info       = Column(Unicode, default=u'')
-    icon       = Column(Unicode, default=u'8.jpg')
+    icon       = Column(Unicode, default=AlloyEnvironment.DEFAULT_ICON)
     language   = Column(Unicode, default=u'python')
     location   = Column(Unicode, default=u'maya')
     script     = Column(UnicodeText, default=u'')
