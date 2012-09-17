@@ -6,7 +6,6 @@ import os
 import sys
 import getopt
 
-
 #___________________________________________________________________________________________________ alloyApplication
 def alloyApplication():
     """A script for..."""
@@ -22,6 +21,7 @@ def alloyApplication():
         import alloy
     except Exception, err:
         print 'LOAD FAILURE: Unable to locate the Alloy source directories.'
+        print err
         return
 
     alloy.run(sys.argv)
