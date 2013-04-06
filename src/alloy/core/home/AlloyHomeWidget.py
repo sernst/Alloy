@@ -8,99 +8,34 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtWebKit import *
 
-from alloy.AlloyEnvironment import AlloyEnvironment
-from alloy.core.application.AlloyWebPage import AlloyWebPage
-from alloy.core.home.AlloyCommunicator import AlloyCommunicator
-from alloy.core.application.remoteExec import remoteExec
-from alloy.data.AlloyData import AlloyData
+from pyglass.gui.web.PyGlassWebView import PyGlassWebView
+from pyglass.widgets.PyGlassWidget import PyGlassWidget
+
 import nimble
 
+from alloy.AlloyEnvironment import AlloyEnvironment
+from alloy.core.application.remoteExec import remoteExec
+from alloy.data.AlloyData import AlloyData
+
 #___________________________________________________________________________________________________ AlloyHomeWidget
-class AlloyHomeWidget(QWidget):
+class AlloyHomeWidget(PyGlassWidget):
     """A class for..."""
 
 #===================================================================================================
 #                                                                                       C L A S S
 
 #___________________________________________________________________________________________________ __init__
-    def __init__(self, parent =None, flags =0):
+    def __init__(self, parent, **kwargs):
         """Creates a new instance of AlloyHomeWidget."""
-        QWidget.__init__(self, parent, flags)
-        self.setStyleSheet(AlloyEnvironment.getStylesheet())
-
-        comm        = AlloyCommunicator()
-        add         = comm.addAction
-        self._comm  = comm
-
-        add('execute', self._handleExecuteCommand)
-        add('getDefaultImage', self._handleReturnDefaultImage)
-
-        add('getCategories', self._handleGetCategories)
-        add('getColumns', self._handleGetColumns)
-        add('getCommandData', self._handleGetCommandData)
-        add('getVariantData', self._handleGetVariantData)
-        add('hasVariants', self._handleHasVariants)
-        add('getVariants', self._handleGetVariants)
-
-        add('getImageCategories', self._handleGetImageCategories)
-        add('getImageList', self._handleGetImageList)
-
-        add('updateColumn', self._handleUpdateColumn)
-        add('reorderVariants', self._handleReorderVariants)
-
-        add('createVariant', self._handleCreateVariant)
-        add('modifyVariant', self._handleModifyVariant)
-        add('deleteVariant', self._handleDeleteVariant)
-
-        add('createCommand', self._handleCreateCommand)
-        add('modifyCommand', self._handleModifyCommand)
-        add('deleteCommand', self._handleDeleteCommand)
-
-        add('createCategory', self._handleCreateCategory)
-        add('modifyCategory', self._handleModifyCategory)
-        add('deleteCategory', self._handleDeleteCategory)
-
-        self._mainBox = QVBoxLayout()
-        self.setLayout(self._mainBox)
-
-        self._view  = QWebView()
-        page        = AlloyWebPage()
-        self._view.setPage(page)
-
-        settings = page.settings()
-        settings.setAttribute(QWebSettings.JavascriptCanAccessClipboard, True)
-
-        if AlloyEnvironment.DEVELOPMENT:
-            self._webInspector = QWebInspector()
-            self._webInspector.setPage(page)
-
-            settings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-            shortcut = QShortcut(self)
-            shortcut.setKey(QKeySequence(Qt.Key_F12))
-            shortcut.activated.connect(self.toggleInspector)
-            self._webInspector.setVisible(False)
-
-        self._view.loadFinished.connect(self._handleLoadFinished)
-        self._view.setUrl(QUrl(AlloyEnvironment.getHomeUrl()))
-        self._mainBox.addWidget(self._view)
+        PyGlassWidget.__init__(self, parent, widgetFile=False, **kwargs)
 
         try:
             conn = nimble.getConnection()
         except Exception, err:
             pass
 
-#___________________________________________________________________________________________________ toggleInspector
-    def toggleInspector(self):
-        self._webInspector.setVisible(not self._webInspector.isVisible())
-
 #===================================================================================================
 #                                                                               P R O T E C T E D
-
-#___________________________________________________________________________________________________ _handleLoadFinished
-    def _handleLoadFinished(self, result):
-        frame = self._view.page().mainFrame()
-        self._comm.frame = frame
-        frame.addToJavaScriptWindowObject('ALLOY', self._comm)
 
 #___________________________________________________________________________________________________ _handleReturnDefaultImage
     def _handleReturnDefaultImage(self, payload):
@@ -237,18 +172,3 @@ class AlloyHomeWidget(QWidget):
 #___________________________________________________________________________________________________ _handleHasVariants
     def _handleHasVariants(self, payload):
         return AlloyData.hasVariants(**payload)
-
-#===================================================================================================
-#                                                                               I N T R I N S I C
-
-#___________________________________________________________________________________________________ __repr__
-    def __repr__(self):
-        return self.__str__()
-
-#___________________________________________________________________________________________________ __unicode__
-    def __unicode__(self):
-        return unicode(self.__str__())
-
-#___________________________________________________________________________________________________ __str__
-    def __str__(self):
-        return '<%s>' % self.__class__.__name__
