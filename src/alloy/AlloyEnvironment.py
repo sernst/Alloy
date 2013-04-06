@@ -23,13 +23,13 @@ class AlloyEnvironment(object):
     )
 
     DEFAULT_ICON = u'maya.png'
-    DEVELOPMENT  = False
+    DEVELOPMENT  = True
     LOG_LEVEL    = 0
 
     _styleSheets = dict()
 
-    _URL     = 'http://17.vizmeweb.com/guiHome/'
-    _DEV_URL = 'http://17.vizmedev.com/guiHome/'
+    _URL     = 'http://ggpj.vizmeweb.com/guiHome/'
+    _DEV_URL = 'http://ggpj.vizmedev.com/guiHome/'
 
 #___________________________________________________________________________________________________ getHomeUrl
     @classmethod
